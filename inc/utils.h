@@ -90,14 +90,4 @@ buildTargets(torch::Tensor targets, torch::Tensor pred_boxes,
 		torch::Tensor pred_cls, torch::Tensor scaled_anchors,
 		float ignore_thres);
 
-torch::Tensor xywh2xyxy(torch::Tensor);
-
-torch::Tensor bbox_iou(torch::Tensor box1, torch::Tensor box2);
-
-torch::Tensor get_batch_statistics(torch::Tensor outputs, torch::Tensor targets, float iou_threshold);
-
-float compute_ap(torch::Tensor r, torch::Tensor p);
-
-std::tuple<torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor,std::vector<int>> ap_per_class(torch::Tensor true_positives, torch::Tensor pred_scores, torch::Tensor pred_labels, std::vector<int> labels);
-
 #include <impl/utils.hpp>
