@@ -14,7 +14,7 @@ struct yoloOps {
 			"/path/to/your/project/cfg/yolov3.cfg";
 	std::string train_weights_path =
 			"/path/to/your/project/weights/darknet53.conv.74";
-	float learn_rate = 0.001;  //defalt: 1e-3, 0.001 in cfg
+	float learn_rate = 0.001;  //default: 1e-3, 0.001 in cfg
 //    float weight_decay = 0.0005;
 	int iterations = 100;
 	int log_interval = 10;
