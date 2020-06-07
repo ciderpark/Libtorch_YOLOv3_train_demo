@@ -266,7 +266,7 @@ struct DetectionLayer : torch::nn::Module
              int num_classes,
              torch::Device device,
              torch::Tensor targets/* = torch::tensor({0})*/,
-             torch::Tensor* layer_loss/* = NULL*/)
+             torch::Tensor* layer_loss/* = nullptr*/)
     {
       return predict_transform (prediction, targets, layer_loss, inp_dim, _anchors, num_classes, device);
     }
@@ -893,6 +893,7 @@ Darknet::forward (torch::Tensor x,
   { result, loss};
 }
 
+// batch_index, left x, left y, right x, right y, object confidence, class_score, class_id
 torch::Tensor
 Darknet::write_results (torch::Tensor prediction,
                         int num_classes,
