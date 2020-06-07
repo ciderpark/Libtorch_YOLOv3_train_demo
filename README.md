@@ -3,4 +3,4 @@ A libtorch implementation of YOLOv3, supports training on custom dataset,  evalu
 ## Requirements
 1. LibTorch v1.4.0
 2. Cuda
-3. OpenCV v3.4+
+3. OpenCV v3.4.10
