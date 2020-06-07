@@ -13,9 +13,9 @@ struct yoloOps {
 	int batch_size = 2;
 	int num_classes = 2;
 	std::string cfg_path =
-			"/your/path/to/cfg/yolov3.cfg";
+			"/path/to/cfg/yolov3.cfg";
 	std::string train_weights_path =
-			"/your/path/to/weights/darknet53.conv.74";
+			"/path/to/weights/darknet53.conv.74";
 	float learn_rate = 1e-5;  //defalt: 1e-3, 0.001 in cfg
 //    float weight_decay = 0.0005;
 	int iterations = 100;
@@ -27,13 +27,13 @@ static yoloOps yolo_ops;
 
 struct voc2clsOptions {
 	std::string train_path =
-			"/your/path/to/train.txt";
+			"/path/to/train.txt";
 	std::string val_path =
-			"/your/path/to/val.txt";
+			"/path/to/val.txt";
 	std::string img_path =
-			"/your/path/to/VOCdevkit/VOC2012/JPEGImages/";
+			"/path/to/VOCdevkit/VOC2012/JPEGImages/";
 	std::string trans_label_path =
-			"/your/path/to/VOCdevkit/VOC2012/2cls/2clsLabels/";
+			"/path/to/VOCdevkit/VOC2012/2cls/2clsLabels/";
 	std::vector<std::string> classes_name {"aeroplane", "bicycle"};
 };
 
