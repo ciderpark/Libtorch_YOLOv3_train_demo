@@ -116,7 +116,7 @@ Example CustomDataset::get(size_t index) {
 	// label
 	torch::Tensor tlabel;
 	std::vector < torch::Tensor > labels;
-	bool write = false;
+	
 	for (auto l : data[index].second) {
 		float x0 = w_factor * (l[2] - l[4] / 2);
 		float y0 = h_factor * (l[3] - l[5] / 2);
