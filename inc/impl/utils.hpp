@@ -131,12 +131,10 @@ Example CustomDataset::get(size_t index) {
 		l[4] *= w_factor / float(w_padded);
 		l[5] *= h_factor / float(h_padded);
 
-//		std::cout << "l:\n" << l << std::endl;
 		labels.push_back(
 				torch::from_blob(l.data(), { 1, 6 }, torch::kFloat32).clone());
-		tlabel = torch::cat(labels);
 	}
-//	std::cout << "tlabel:\n" << tlabel << std::endl;
+	tlabel = torch::cat(labels);
 
 	return
 	{	tdata, tlabel};
