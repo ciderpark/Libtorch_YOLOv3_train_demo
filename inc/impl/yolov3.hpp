@@ -80,7 +80,7 @@ split (const string& str,
   std::vector < string > tmp;
   split (str, tmp, sep);
 
-  for (int i = 0; i < tmp.size (); i++)
+  for (size_t i = 0; i < tmp.size (); i++)
   {
     ret_.push_back (std::stoi (tmp[i]));
   }
@@ -164,10 +164,10 @@ conv_options (int64_t in_planes,
   return conv_options;
 }
 
-torch::nn::BatchNormOptions
+torch::nn::BatchNorm2dOptions
 bn_options (int64_t features)
 {
-  torch::nn::BatchNormOptions bn_options = torch::nn::BatchNormOptions (features);
+  torch::nn::BatchNorm2dOptions bn_options = torch::nn::BatchNorm2dOptions (features);
   bn_options.affine (true);
   bn_options.track_running_stats (true);
   return bn_options;
@@ -286,7 +286,7 @@ struct DetectionLayer : torch::nn::Module
       int bbox_attrs = 5 + num_classes;
       int num_anchors = anchors.size () / 2;
 
-      for (int i = 0; i < anchors.size (); i++)
+      for (size_t i = 0; i < anchors.size (); i++)
       {
         anchors[i] = anchors[i] / stride;
       }
@@ -492,7 +492,7 @@ Darknet::create_modules ()
 
       if (batch_normalize > 0)
       {
-        torch::nn::BatchNorm bn = torch::nn::BatchNorm (bn_options (filters));
+        torch::nn::BatchNorm2d bn = torch::nn::BatchNorm2d (bn_options (filters));
         module->push_back (bn);
       }
 
@@ -581,7 +581,7 @@ Darknet::create_modules ()
 
       std::vector<float> anchor_points;
       int pos;
-      for (int i = 0; i < masks.size (); i++)
+      for (size_t i = 0; i < masks.size (); i++)
       {
         pos = masks[i];
         anchor_points.push_back (anchors[pos * 2]);
@@ -625,7 +625,7 @@ void
 Darknet::load_weights (const string weight_file)
 {
   ifstream fs (weight_file, ios::binary);
-
+  assert(fs.is_open());
   // header info: 5 * int32_t
   int32_t header_size = sizeof(int32_t) * 5;
 
@@ -674,7 +674,7 @@ Darknet::load_weights (const string weight_file)
       // second module
       auto bn_module = seq_module.ptr ()->ptr (1);
 
-      torch::nn::BatchNormImpl *bn_imp = dynamic_cast<torch::nn::BatchNormImpl *> (bn_module.get ());
+      torch::nn::BatchNorm2dImpl *bn_imp = dynamic_cast<torch::nn::BatchNorm2dImpl *> (bn_module.get ());
 
       int num_bn_biases = bn_imp->bias.numel ();
 
@@ -957,7 +957,7 @@ Darknet::write_results (torch::Tensor prediction,
     for (int m = 0, len = image_prediction_data.size (0); m < len; m++)
     {
       bool found = false;
-      for (int n = 0; n < img_classes.size (); n++)
+      for (size_t n = 0; n < img_classes.size (); n++)
       {
         auto ret = (image_prediction_data[m][6] == img_classes[n]);
         if (torch::nonzero (ret).size (0) > 0)
@@ -970,7 +970,7 @@ Darknet::write_results (torch::Tensor prediction,
         img_classes.push_back (image_prediction_data[m][6]);
     }
 
-    for (int k = 0; k < img_classes.size (); k++)
+    for (size_t k = 0; k < img_classes.size (); k++)
     {
       auto cls = img_classes[k];
 

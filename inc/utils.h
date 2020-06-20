@@ -7,37 +7,67 @@
 
 using Data = std::vector<std::pair<std::string, std::vector<std::vector<float>>>>;
 using Example = torch::data::Example<>;
+class COCODateOps {
+public:
+	COCODateOps() {
+		loadClsName();
+	}
+	int classes_num = 80;
+	std::string train_pathes =
+			"/home/ciderpark/eclipse-workspace/YOLO-V3_test/data/coco/trainvalno5k.txt";
+	std::string valid_pathes =
+			"/home/ciderpark/eclipse-workspace/YOLO-V3_test/data/coco/5k.txt";
+	std::string classes_names_path =
+			"/home/ciderpark/eclipse-workspace/YOLO-V3_test/data/coco.names";
+	std::vector<std::string> classes_names;
+	void loadClsName();
+};
+
+static COCODateOps data_ops;
 
 struct yoloOps {
 	int image_size = 416;
 	int batch_size = 2;
-	int num_classes = 2;
+	int num_classes = 80;
 	std::string cfg_path =
-			"/path/to/cfg/yolov3.cfg";
+			"/home/ciderpark/eclipse-workspace/YOLO-V3_coco/cfg/yolov3.cfg";
 	std::string train_weights_path =
-			"/path/to/weights/darknet53.conv.74";
-	float learn_rate = 1e-5;  //defalt: 1e-3, 0.001 in cfg
-//    float weight_decay = 0.0005;
+//			"/home/ciderpark/eclipse-workspace/YOLO-V3_voc2012/build/yolov3-voc2ttt.pt";
+//			"/home/ciderpark/eclipse-workspace/YOLO-V3_voc2012/weights/darknet53.conv.74";
+			"/home/ciderpark/eclipse-workspace/YOLO-V3_test/weights/yolov3.weights";
+	float learn_rate = 1e-3;  //defalt: 1e-3, 0.001 in cfg
+	float weight_decay = 0.0005;
 	int iterations = 100;
 	int log_interval = 10;
-	int evaluation_interval = 1;
+	int evaluation_interval = 5;
 };
 
 static yoloOps yolo_ops;
 
-struct voc2clsOptions {
-	std::string train_path =
-			"/path/to/train.txt";
-	std::string val_path =
-			"/path/to/val.txt";
-	std::string img_path =
-			"/path/to/VOCdevkit/VOC2012/JPEGImages/";
-	std::string trans_label_path =
-			"/path/to/VOCdevkit/VOC2012/2cls/2clsLabels/";
-	std::vector<std::string> classes_name {"aeroplane", "bicycle"};
-};
+/*struct vocOptions
+ {
+ std::string train_path = "/home/ciderpark/Documents/VOCdevkit/VOC2012/ImageSets/Main/train.txt";
+ std::string val_path = "/home/ciderpark/Documents/VOCdevkit/VOC2012/ImageSets/Main/val.txt";
+ std::string label_path = "/home/ciderpark/Documents/VOCdevkit/VOC2012/Annotations/";
+ std::string img_path = "/home/ciderpark/Documents/VOCdevkit/VOC2012/JPEGImages/";
+ std::string trans_label_path = "/home/ciderpark/Documents/VOCdevkit/VOC2012/TransLabels/";
+ };
 
-static voc2clsOptions voc2_ops;
+ static vocOptions voc_ops;*/
+
+/*struct voc2clsOptions {
+ std::string train_path =
+ "/home/ciderpark/Documents/VOCdevkit/VOC2012/2cls/train.txt";
+ std::string val_path =
+ "/home/ciderpark/Documents/VOCdevkit/VOC2012/2cls/val.txt";
+ std::string img_path =
+ "/home/ciderpark/Documents/VOCdevkit/VOC2012/JPEGImages/";
+ std::string trans_label_path =
+ "/home/ciderpark/Documents/VOCdevkit/VOC2012/2cls/2clsLabels/";
+ std::vector<std::string> classes_name {"aeroplane", "bicycle"};
+ };
+
+ static voc2clsOptions voc2_ops;*/
 
 std::pair<Data, Data>
 readInfo();

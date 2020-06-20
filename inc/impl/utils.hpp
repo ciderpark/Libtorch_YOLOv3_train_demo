@@ -2,6 +2,19 @@
 #define UTILS_HPP_
 #include "utils.h"
 
+void COCODateOps::loadClsName(){
+	std::ifstream stream_t(classes_names_path);
+	assert(stream_t.is_open());
+	while(true){
+		std::string name;
+		stream_t >> name;
+		if (stream_t.eof())
+			break;
+		classes_names.push_back(name);
+	}
+	stream_t.close();
+}
+
 std::pair<Data, Data> readInfo() {
 	Data train, valid;
 
@@ -9,19 +22,20 @@ std::pair<Data, Data> readInfo() {
 	std::vector<std::vector<float>> label;
 
 	//train set
-	std::ifstream stream_t(voc2_ops.train_path);
+	/*std::ifstream stream_t(data_ops.train_pathes);
+
 	assert(stream_t.is_open());
 	while (true) {
 		stream_t >> name;
 		if (stream_t.eof())
 			break;
-		std::string path = voc2_ops.img_path + name + ".jpg";
-		std::string path_l = voc2_ops.trans_label_path + name + ".txt";
-
+		std::string path = name;
+		std::string path_l = name.replace (57, 6, "labels").replace (name.end () - 3, name.end (), "txt");
+//		std::cout << path_l << std::endl;
 		std::ifstream stream_l(path_l);
 		assert(stream_l.is_open());
-		/*if (!stream_l.is_open())
-		 continue;*/
+		if (!stream_l.is_open())
+		 continue;
 		//
 		float c, x, y, w, h, b = 0.0;
 		while (true) {
@@ -33,23 +47,23 @@ std::pair<Data, Data> readInfo() {
 
 		train.push_back(std::make_pair(path, label));
 		label.clear();
-	}
+	}*/
 
 	//valid set
-	std::ifstream stream_v(voc2_ops.val_path);
+	std::ifstream stream_v(data_ops.valid_pathes);
 	assert(stream_v.is_open());
 	while (true) {
 		stream_v >> name;
 		if (stream_v.eof())
 			break;
 
-		std::string path = voc2_ops.img_path + name + ".jpg";
-		std::string path_l = voc2_ops.trans_label_path + name + ".txt";
+		std::string path = name;
+		std::string path_l = name.replace (57, 6, "labels").replace (name.end () - 3, name.end (), "txt");
 
 		std::ifstream stream_l(path_l);
-		assert(stream_l.is_open());
-		/*if (!stream_l.is_open())
-		 continue;*/
+//		assert(stream_l.is_open());
+		if (!stream_l.is_open())
+		 continue;
 		//
 		float c, x, y, w, h, b = 0.0;
 		while (true) {
@@ -62,7 +76,7 @@ std::pair<Data, Data> readInfo() {
 		valid.push_back(std::make_pair(path, label));
 		label.clear();
 	}
-
+	std::cout << valid.size() << std::endl;
 	std::random_shuffle(train.begin(), train.end());
 	std::random_shuffle(valid.begin(), valid.end());
 	return std::make_pair(train, valid);
@@ -116,7 +130,7 @@ Example CustomDataset::get(size_t index) {
 	// label
 	torch::Tensor tlabel;
 	std::vector < torch::Tensor > labels;
-	
+
 	for (auto l : data[index].second) {
 		float x0 = w_factor * (l[2] - l[4] / 2);
 		float y0 = h_factor * (l[3] - l[5] / 2);
@@ -131,10 +145,12 @@ Example CustomDataset::get(size_t index) {
 		l[4] *= w_factor / float(w_padded);
 		l[5] *= h_factor / float(h_padded);
 
+//		std::cout << "l:\n" << l << std::endl;
 		labels.push_back(
 				torch::from_blob(l.data(), { 1, 6 }, torch::kFloat32).clone());
 	}
 	tlabel = torch::cat(labels);
+//	std::cout << "tlabel:\n" << tlabel << std::endl;
 
 	return
 	{	tdata, tlabel};
@@ -302,7 +318,7 @@ torch::Tensor bbox_iou(torch::Tensor box1, torch::Tensor box2,
 torch::Tensor get_batch_statistics(torch::Tensor outputs, torch::Tensor targets,
 		float iou_threshold) {
 	if (outputs.dim() == 1)
-		return torch::tensor( { 0 });
+		return torch::tensor( { 0, 0, -1}, torch::kFloat).to(outputs.device()).unsqueeze(0);
 	std::vector < torch::Tensor > temp { };
 	for (int sample_i = 0; sample_i < yolo_ops.num_classes; sample_i++) {
 		torch::Tensor output = outputs.index(
@@ -347,6 +363,9 @@ torch::Tensor get_batch_statistics(torch::Tensor outputs, torch::Tensor targets,
 				torch::cat( { true_positives.unsqueeze(1),
 						pred_scores.unsqueeze(1), pred_labels.unsqueeze(1) },
 						1));
+	}
+	if(temp.empty()){
+		return torch::tensor( { 0, 0, -1}, torch::kFloat).to(outputs.device()).unsqueeze(0);
 	}
 	torch::Tensor batch_metrics = torch::cat(temp).to(targets.device());
 
@@ -397,9 +416,10 @@ std::tuple<torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor,
 		if(!n_gt && !n_p)
 			continue;
 		else if(!n_gt || !n_p){
-			ap.push_back(torch::tensor({0}));
-			p.push_back(torch::tensor({0}));
-			r.push_back(torch::tensor({0}));
+			torch::Tensor zero = torch::tensor({0}, torch::kFloat).squeeze(0).to(tp.device());
+			ap.push_back(zero);
+			p.push_back(zero);
+			r.push_back(zero);
 		}
 		else{
 			// Accumulate FPs and TPs
@@ -413,7 +433,7 @@ std::tuple<torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor,
 			torch::Tensor precision_curve = tpc / (tpc + fpc);
 			p.push_back(precision_curve.select(0, -1));
 			// AP from recall-precision curve
-			ap.push_back(compute_ap(recall_curve, precision_curve));
+			ap.push_back(compute_ap(recall_curve, precision_curve).to(tp.device()));
 		}
 	}
 	// Compute F1 score (harmonic mean of precision and recall)
