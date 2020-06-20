@@ -23,7 +23,7 @@ void printLog(){
 	vector<string> log_item {"grid_size","loss","x","y","w","h","conf", "cls", "cls_acc", "recall50", "recall75", "precision", "conf_obj", "conf_noobj"};
 	for(string s : log_item){
 		std::cout << std::setw(15) << std::setiosflags(std::ios::left) << "| " + s;
-		for(int i = 0; i < metrics_v.size(); i++){
+		for(size_t i = 0; i < metrics_v.size(); i++){
 			std::cout << std::setw(15) << std::setiosflags(std::ios::left) << "| " + to_string(metrics_v[i][s]);
 		}
 		std::cout << "|" << std::endl;
@@ -71,9 +71,7 @@ void evaluate(shared_ptr<Darknet> net, DataLoader& loader, size_t valid_size, fl
 		targets.slice(1, 2, 6) = xywh2xyxy(targets.slice(1, 2, 6)) * yolo_ops.image_size;
 		torch::Tensor output = net->forward(input);
 		torch::Tensor results = net->write_results(output, yolo_ops.num_classes, conf_thres, nms_thres).to(device);
-		if(results.dim() > 1){
-			sample_metrics.push_back(get_batch_statistics(results, targets, iou_thres));
-		}
+		sample_metrics.push_back(get_batch_statistics(results, targets, iou_thres));
 	}
 	torch::Tensor labels_t = torch::cat(labels);
 	torch::Tensor sample_metrics_t = torch::cat(sample_metrics);
@@ -83,9 +81,10 @@ void evaluate(shared_ptr<Darknet> net, DataLoader& loader, size_t valid_size, fl
 	torch::Tensor precision, recall, AP, f1, ap_class;
 	std::tie(precision, recall, AP, f1, ap_class) = ap_per_class(true_positives, pred_scores, pred_labels, labels_t);
 	std::cout << "Average Precisions:" << std::endl;
+	std::cout << ap_class.size(0) << std::endl;
 	for(int i = 0; i < ap_class.size(0); i++){
 		int c = ap_class[i].item<int>();
-		std::cout << "Class: " << std::setw(15) << std::setiosflags(std::ios::left) << voc2_ops.classes_name[c] << " - AP: " << AP[c].item<float>() << std::endl;
+		std::cout << "Class: " << std::setw(15) << std::setiosflags(std::ios::left) << data_ops.classes_names[c] << " - AP: " << AP[c].item<float>() << std::endl;
 	}
 	std::cout << "mAP: " << AP.mean().item<float>() << std::endl;
 }
@@ -114,9 +113,9 @@ main (int argc,
   // Dataset
   std::cout << "loading dataset ..." << std::endl;
   auto data = readInfo ();
-  auto train_set = CustomDataset (data.first).map (StackAndCat<>());
+  /*auto train_set = CustomDataset (data.first).map (StackAndCat<>());
   auto train_size = train_set.size ().value ();
-  auto train_loader = torch::data::make_data_loader<torch::data::samplers::SequentialSampler> (std::move (train_set), yolo_ops.batch_size);
+  auto train_loader = torch::data::make_data_loader<torch::data::samplers::SequentialSampler> (std::move (train_set), yolo_ops.batch_size);*/
 
   auto valid_set = CustomDataset (data.second).map (StackAndCat<>());
   auto valid_size = valid_set.size ().value ();
@@ -131,23 +130,23 @@ main (int argc,
   std::cout << "Done." << std::endl;
   // Load weights
   std::cout << "loading weight ..." << endl;
-//  net->load_weights (yolo_ops.train_weights_path);
-  torch::load(net, yolo_ops.train_weights_path);
+  net->load_weights (yolo_ops.train_weights_path);
+//  torch::load(net, yolo_ops.train_weights_path);
   std::cout << "Done." << endl;
 
   net->to (device);
-  torch::optim::Adam optimizer (net->parameters (), torch::optim::AdamOptions (yolo_ops.learn_rate)/*.weight_decay (yolo_ops.weight_decay)*/);
+  torch::optim::Adam optimizer (net->parameters (), torch::optim::AdamOptions (yolo_ops.learn_rate).weight_decay (yolo_ops.weight_decay));
 
   std::cout << "train start ..." << std::endl;
-  for (size_t i = 0; i < yolo_ops.iterations; i++)
+  for (int i = 0; i < yolo_ops.iterations; i++)
   {
-	train(net, *train_loader, optimizer, i + 1, train_size, device);
+//	train(net, *train_loader, optimizer, i + 1, train_size, device);
 	if(!((i + 1) % yolo_ops.evaluation_interval)){
-		evaluate(net, *valid_loader, valid_size, 0.5, 0.6, 0.4, device);
+		evaluate(net, *valid_loader, valid_size, 0.5, 0.5, 0.5, device);
 	}
 //	break;
   }
-  torch::save (net, "yolov3-voc2t.pt");
+//  torch::save (net, "yolov3-voc2tttt.pt");
   std::cout << "train done." << std::endl;
   return (0);
 }
