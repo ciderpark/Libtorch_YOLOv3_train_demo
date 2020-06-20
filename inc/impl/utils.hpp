@@ -22,7 +22,7 @@ std::pair<Data, Data> readInfo() {
 	std::vector<std::vector<float>> label;
 
 	//train set
-	/*std::ifstream stream_t(data_ops.train_pathes);
+	std::ifstream stream_t(data_ops.train_pathes);
 
 	assert(stream_t.is_open());
 	while (true) {
@@ -31,7 +31,6 @@ std::pair<Data, Data> readInfo() {
 			break;
 		std::string path = name;
 		std::string path_l = name.replace (57, 6, "labels").replace (name.end () - 3, name.end (), "txt");
-//		std::cout << path_l << std::endl;
 		std::ifstream stream_l(path_l);
 		assert(stream_l.is_open());
 		if (!stream_l.is_open())
@@ -47,7 +46,7 @@ std::pair<Data, Data> readInfo() {
 
 		train.push_back(std::make_pair(path, label));
 		label.clear();
-	}*/
+	}
 
 	//valid set
 	std::ifstream stream_v(data_ops.valid_pathes);
