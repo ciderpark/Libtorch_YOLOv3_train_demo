@@ -5,5 +5,5 @@ A libtorch implementation of YOLOv3, supports training on custom dataset,  evalu
 2. CUDA
 3. OpenCV v3.4.10
 ## Build
-cd build
+cd build\
 cmake -DCMAKE_PREFIX_PATH=path/to/libtorch -DCMAKE_ECLIPSE_VERSION=4.15 -G "Eclipse CDT4 - Unix Makefiles" ../src
