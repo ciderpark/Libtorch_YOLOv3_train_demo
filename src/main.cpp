@@ -140,13 +140,13 @@ main (int argc,
   std::cout << "train start ..." << std::endl;
   for (int i = 0; i < yolo_ops.iterations; i++)
   {
-//	train(net, *train_loader, optimizer, i + 1, train_size, device);
+	train(net, *train_loader, optimizer, i + 1, train_size, device);
 	if(!((i + 1) % yolo_ops.evaluation_interval)){
 		evaluate(net, *valid_loader, valid_size, 0.5, 0.5, 0.5, device);
 	}
 //	break;
   }
-//  torch::save (net, "yolov3-voc2tttt.pt");
+  torch::save (net, "yolov3-ckpt.pt");
   std::cout << "train done." << std::endl;
   return (0);
 }
