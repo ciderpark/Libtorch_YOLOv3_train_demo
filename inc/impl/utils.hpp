@@ -319,7 +319,7 @@ torch::Tensor get_batch_statistics(torch::Tensor outputs, torch::Tensor targets,
 	if (outputs.dim() == 1)
 		return torch::tensor( { 0, 0, -1}, torch::kFloat).to(outputs.device()).unsqueeze(0);
 	std::vector < torch::Tensor > temp { };
-	for (int sample_i = 0; sample_i < yolo_ops.num_classes; sample_i++) {
+	for (int sample_i = 0; sample_i < yolo_ops.batch_size; sample_i++) {
 		torch::Tensor output = outputs.index(
 				(outputs.select(1, 0) == sample_i).to(torch::kBool));
 		if (!output.size(0))
