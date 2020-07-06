@@ -81,7 +81,6 @@ void evaluate(shared_ptr<Darknet> net, DataLoader& loader, size_t valid_size, fl
 	torch::Tensor precision, recall, AP, f1, ap_class;
 	std::tie(precision, recall, AP, f1, ap_class) = ap_per_class(true_positives, pred_scores, pred_labels, labels_t);
 	std::cout << "Average Precisions:" << std::endl;
-	std::cout << ap_class.size(0) << std::endl;
 	for(int i = 0; i < ap_class.size(0); i++){
 		int c = ap_class[i].item<int>();
 		std::cout << "Class: " << std::setw(15) << std::setiosflags(std::ios::left) << data_ops.classes_names[c] << " - AP: " << AP[c].item<float>() << std::endl;
@@ -113,9 +112,9 @@ main (int argc,
   // Dataset
   std::cout << "loading dataset ..." << std::endl;
   auto data = readInfo ();
-  /*auto train_set = CustomDataset (data.first).map (StackAndCat<>());
+  auto train_set = CustomDataset (data.first).map (StackAndCat<>());
   auto train_size = train_set.size ().value ();
-  auto train_loader = torch::data::make_data_loader<torch::data::samplers::SequentialSampler> (std::move (train_set), yolo_ops.batch_size);*/
+  auto train_loader = torch::data::make_data_loader<torch::data::samplers::SequentialSampler> (std::move (train_set), yolo_ops.batch_size);
 
   auto valid_set = CustomDataset (data.second).map (StackAndCat<>());
   auto valid_size = valid_set.size ().value ();
