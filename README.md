@@ -2,7 +2,7 @@
 A libtorch implementation of YOLOv3, supports training on custom dataset,  evaluation and detection.
 ## Requirements
 1. LibTorch v1.5.0
-2. CUDA
+2. CUDA v10.1
 3. OpenCV v3.4.10
 ## Build
 cd build\
