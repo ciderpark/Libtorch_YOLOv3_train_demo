@@ -9,4 +9,4 @@ cd build\
 cmake -DCMAKE_PREFIX_PATH=path/to/libtorch -DCMAKE_ECLIPSE_VERSION=4.15 -G "Eclipse CDT4 - Unix Makefiles" ../src
 # Recommened
 Use more "standard" method: torch.jit(TorchScript), and do pre & post process in LibTorch.
-Note that this implementation does not support multi scale training yet, poor performance on diffcult tasks.
+Note that this implementation does not support multi scale training yet, poor performance on difficult tasks.
