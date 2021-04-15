@@ -7,6 +7,6 @@ A libtorch implementation of YOLOv3, supports training on custom dataset,  evalu
 ## Build
 cd build\
 cmake -DCMAKE_PREFIX_PATH=path/to/libtorch -DCMAKE_ECLIPSE_VERSION=4.15 -G "Eclipse CDT4 - Unix Makefiles" ../src
-# Recommened
+# Recommend
 Use more "standard" method: torch.jit(TorchScript), and do pre & post process in LibTorch.
 Note that this implementation does not support multi scale training yet, poor performance on difficult tasks.
